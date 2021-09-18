@@ -114,6 +114,18 @@
     >
       <v-icon>mdi-account</v-icon>
     </v-btn>
+
+    <v-btn
+      class="ml-2"
+      min-width="0"
+      text
+      :loading="logoutLoading"
+      @click="logout()"
+    >
+      <v-icon v-if="!logoutLoading">
+        mdi-logout
+      </v-icon>
+    </v-btn>
   </v-app-bar>
 </template>
 
@@ -161,6 +173,7 @@
     },
 
     data: () => ({
+      logoutLoading: false,
       notifications: [
         'Mike John Responded to your email',
         'You have 5 new tasks',
@@ -178,6 +191,13 @@
       ...mapMutations({
         setDrawer: 'SET_DRAWER',
       }),
+      logout () {
+        this.logoutLoading = true
+        this.$store.dispatch('logout').then(() => {
+          console.log('logout')
+          this.logoutLoading = false
+        })
+      },
     },
   }
 </script>

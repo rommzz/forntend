@@ -20,6 +20,10 @@ const router = new Router({
 		{
       path: '/',
       component: () => import('@/views/dashboard/Index'),
+			redirect: 'Login',
+			meta: {
+				auth: true,
+			},
 			children: [
         // Dashboard
         {
@@ -32,6 +36,12 @@ const router = new Router({
           name: 'User Profile',
           path: 'pages/user',
           component: () => import('@/views/dashboard/pages/UserProfile'),
+        },
+        // Questions list
+        {
+          name: 'Questions',
+          path: 'questions',
+          component: () => import('@/views/questions/Questions'),
         },
         {
           name: 'Notifications',
