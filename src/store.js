@@ -28,11 +28,13 @@ export default new Vuex.Store({
     },
 
     /* User */
+    /* eslint-disable */
     setUserData (state, userData) {
       state.user = userData
       localStorage.setItem('user', JSON.stringify(userData))
-      axios.defaults.headers.common.Authorization = `Bearer ${userData.token}`
+      axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`
     },
+    /* eslint-enable */
 
     clearUserData () {
       localStorage.removeItem('user')
@@ -48,7 +50,7 @@ export default new Vuex.Store({
   actions: {
 		login ({ commit }, credentials) {
       return axios
-        .post('/login', credentials, {
+        .post('/auth/login', credentials, {
           headers: {
           'Content-Type': 'application/json',
         },

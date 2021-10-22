@@ -23,8 +23,15 @@ import i18n from './i18n'
 import axios from 'axios'
 
 Vue.config.productionTip = false
-
+/* eslint-disable */
 axios.defaults.baseURL = 'http://localhost:8000/api/'
+let user = JSON.parse(localStorage.getItem('user'))
+if (user) {
+  console.log(token);
+  axios.defaults.headers.common['Authorization'] = `Bearer ${(user.token)}`  
+}
+
+/* eslint-enable */
 
 new Vue({
   router,
