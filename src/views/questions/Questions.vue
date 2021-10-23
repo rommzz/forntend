@@ -46,63 +46,47 @@
         </thead>
 
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>Dakota Rice</td>
-            <td>Niger</td>
-            <td>Oud-Turnhout</td>
+          <tr
+            v-for="(item, index) in data"
+            :key="index"
+          >
+            <td>{{ item.judul }}</td>
+            <td>{{ item.matpel }}</td>
+            <td>{{ item.kelas }}</td>
+            <td>{{ item.jenis }}</td>
             <td class="text-right">
-              $36,738
-            </td>
-          </tr>
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    small
+                    color="secondary"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-icon>
+                      mdi-pencil
+                    </v-icon>
+                  </v-btn>
+                </template>
+                <span>Edit Soal</span>
+              </v-tooltip>
 
-          <tr>
-            <td>2</td>
-            <td>Minverva Hooper</td>
-            <td>Curaçao</td>
-            <td>Sinaas-Waas</td>
-            <td class="text-right">
-              $23,789
-            </td>
-          </tr>
-
-          <tr>
-            <td>3</td>
-            <td>Sage Rodriguez</td>
-            <td>Netherlands</td>
-            <td>Baileux</td>
-            <td class="text-right">
-              $56,142
-            </td>
-          </tr>
-
-          <tr>
-            <td>4</td>
-            <td>Philip Chaney</td>
-            <td>Korea, South</td>
-            <td>Overland Park</td>
-            <td class="text-right">
-              $38,735
-            </td>
-          </tr>
-
-          <tr>
-            <td>5</td>
-            <td>Doris Greene</td>
-            <td>Malawi</td>
-            <td>Feldkirchen in Kärnten</td>
-            <td class="text-right">
-              $63,542
-            </td>
-          </tr>
-
-          <tr>
-            <td>6</td>
-            <td>Mason Porter</td>
-            <td>Chile</td>
-            <td>Gloucester</td>
-            <td class="text-right">
-              $78,615
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    small
+                    class="ml-1"
+                    color="red"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-icon>
+                      mdi-delete
+                    </v-icon>
+                  </v-btn>
+                </template>
+                <span>Hapus Soal</span>
+              </v-tooltip>
             </td>
           </tr>
         </tbody>
@@ -148,6 +132,7 @@
         <v-card-actions>
           <v-btn
             color="primary"
+            :loading="loadingProcess"
             @click="process()"
           >
             Simpan
@@ -167,12 +152,24 @@
   import axios from 'axios'
   export default {
     name: 'QuestionIndex',
+    props: {
+      id: {
+        type: String,
+        default: null,
+      },
+    },
     data () {
       return {
+        data: [],
+        user: this.$store.state.user.user,
+        loadingProcess: false,
         valid: true,
         newDialog: false,
         form: this.formObject(),
       }
+    },
+    created () {
+      this.getData()
     },
     methods: {
       validate () {
@@ -197,12 +194,24 @@
         if (!this.validate()) {
           return
         }
+        this.loadingProcess = true
         axios({
           method: 'post',
           url: '/quiz/store',
           data: this.form,
         }).then(r => {
           console.log(r)
+        }).catch(e => console.log(e)).finally(() => { this.loadingProcess = false })
+      },
+      getData () {
+        axios.get('/quiz', {
+          params: {
+            id: this.user.id,
+          },
+        }).then(r => {
+          this.data = r.data.data
+        }).catch(function (error) {
+          console.log(error)
         })
       },
     },
