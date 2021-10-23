@@ -57,7 +57,6 @@ export default new Vuex.Store({
 })
         .then(({ data }) => {
           commit('setUserData', data)
-          localStorage.removeItem('userLoginAttempt')
         })
         .catch(err => {
 					console.log(err)
@@ -66,6 +65,10 @@ export default new Vuex.Store({
 
     logout ({ commit }) {
       commit('clearUserData')
+    },
+
+    storeUser ({ commit }, data) {
+      commit('setUserData', data)
     },
   },
 })

@@ -25,11 +25,7 @@ import axios from 'axios'
 Vue.config.productionTip = false
 /* eslint-disable */
 axios.defaults.baseURL = 'http://localhost:8000/api/'
-let user = JSON.parse(localStorage.getItem('user'))
-if (user) {
-  console.log(token);
-  axios.defaults.headers.common['Authorization'] = `Bearer ${(user.token)}`  
-}
+
 
 /* eslint-enable */
 
@@ -38,5 +34,11 @@ new Vue({
   store,
   vuetify,
   i18n,
+  created () {
+    const user = JSON.parse(localStorage.getItem('user'))
+    if (user) {
+      this.$store.dispatch('storeUser', user)
+    }
+  },
   render: h => h(App),
 }).$mount('#app')
