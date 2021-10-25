@@ -62,6 +62,7 @@
                     color="secondary"
                     v-bind="attrs"
                     v-on="on"
+                    @click="$router.push({ path: `/questions/${item.id}` })"
                   >
                     <v-icon>
                       mdi-pencil
@@ -152,12 +153,6 @@
   import axios from 'axios'
   export default {
     name: 'QuestionIndex',
-    props: {
-      id: {
-        type: String,
-        default: null,
-      },
-    },
     data () {
       return {
         data: [],

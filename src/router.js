@@ -44,6 +44,12 @@ const router = new Router({
           component: () => import('@/views/questions/Questions'),
         },
         {
+          name: 'Questions.soal',
+          path: 'questions/:id',
+          props: true,
+          component: () => import('@/views/questions/QuestionsSoal'),
+        },
+        {
           name: 'Notifications',
           path: 'components/notifications',
           component: () => import('@/views/dashboard/component/Notifications'),
