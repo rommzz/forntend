@@ -226,13 +226,21 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <form-pertanyaan
+      :id="data.id"
+      ref="formPertanyaan"
+    />
   </v-container>
 </template>
 <script>
   import axios from 'axios'
+  import formPertanyaan from './FormPertanyaan.vue'
   const abjad = ('abcdefghijklmnopqrstuvwxyz').split('')
   export default {
     name: 'QuestionSoal',
+    components: {
+      formPertanyaan,
+    },
     props: {
       id: {
         type: String,
@@ -255,6 +263,9 @@
       this.getData()
     },
     methods: {
+      addSoal () {
+        this.$refs.formPertanyaan.open(this.data.id)
+      },
       validate () {
         return this.$refs.form.validate()
       },
