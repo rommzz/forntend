@@ -10,21 +10,31 @@
     />
 
     <v-card>
-      <v-card-title
-        class="d-flex justify-space-between align-center"
+      <div
+        v-if="loadingData"
+        class="pa-11 text-center"
       >
-        <div class="">
-          Data Soal
-        </div>
-        <v-btn
+        <v-progress-circular
+          :size="50"
           color="primary"
-          class="ma-0"
-          @click="newDialog = true"
+          indeterminate
+        />
+      </div>
+      <template v-else>
+        <v-card-title
+          class="d-flex justify-space-between align-center"
         >
-          edit data soal
-        </v-btn>
-      </v-card-title>
-      <template v-if="data.soal">
+          <div class="">
+            Data Soal
+          </div>
+          <v-btn
+            color="primary"
+            class="ma-0"
+            @click="newDialog = true"
+          >
+            edit data soal
+          </v-btn>
+        </v-card-title>
         <v-list
           subheader
           two-line
@@ -73,104 +83,118 @@
             </v-list-item-content>
           </v-list-item>
         </v-list>
-        <v-sheet
-          class="container"
-          elevation="5"
-        >
-          <v-row>
-            <v-col>
-              <h3 class="pl-1">
-                Soal
-              </h3>
-            </v-col>
-            <v-spacer />
-            <v-col class="text-right">
-              <v-btn
-                color="primary"
-                @click="addSoal()"
-              >
-                tambah soal
-              </v-btn>
-            </v-col>
-          </v-row>
-          <v-simple-table>
-            <thead>
-              <tr>
-                <th class="primary--text">
-                  No
-                </th>
-                <th
-                  colspan="3"
-                  class="primary--text"
-                >
+        <template v-if="data.soal.length">
+          <v-sheet
+            class="container"
+            elevation="5"
+          >
+            <v-row>
+              <v-col>
+                <h3 class="pl-1">
                   Soal
-                </th>
-                <th class="text-right primary--text">
-                  Aksi
-                </th>
-              </tr>
-            </thead>
+                </h3>
+              </v-col>
+              <v-spacer />
+              <v-col class="text-right">
+                <v-btn
+                  color="primary"
+                  @click="addSoal()"
+                >
+                  tambah soal
+                </v-btn>
+              </v-col>
+            </v-row>
+            <v-simple-table>
+              <thead>
+                <tr>
+                  <th class="primary--text">
+                    No
+                  </th>
+                  <th
+                    colspan="3"
+                    class="primary--text"
+                  >
+                    Soal
+                  </th>
+                  <th class="text-right primary--text">
+                    Aksi
+                  </th>
+                </tr>
+              </thead>
 
-            <tbody>
-              <tr
-                v-for="(item, index) in data.soal"
-                :key="index"
-              >
-                <td>
-                  {{ index+1 }}
-                </td>
-                <td colspan="3">
-                  <div style="text-transform: capitalize">
-                    {{ item.soal }}
-                  </div>
-                  <div v-if="item.jenis == 'pilihan_ganda'">
-                    <div>
-                      <span class="primary--text">a.</span> jembot kreweol
+              <tbody>
+                <tr
+                  v-for="(item, index) in data.soal"
+                  :key="index"
+                >
+                  <td>
+                    {{ index+1 }}
+                  </td>
+                  <td colspan="3">
+                    <div style="text-transform: capitalize">
+                      {{ item.soal }}
                     </div>
-                  </div>
-                </td>
-                <td class="text-right">
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        small
-                        color="secondary"
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                        <v-icon>
-                          mdi-pencil
-                        </v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Edit Soal</span>
-                  </v-tooltip>
+                    <div v-if="item.jenis == 'pilihan_ganda'">
+                      <div>
+                        <span class="primary--text">a.</span> jembot kreweol
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          small
+                          color="secondary"
+                          v-bind="attrs"
+                          v-on="on"
+                        >
+                          <v-icon>
+                            mdi-pencil
+                          </v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Edit Soal</span>
+                    </v-tooltip>
 
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        small
-                        class="ml-1"
-                        color="red"
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                        <v-icon>
-                          mdi-delete
-                        </v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Hapus Soal</span>
-                  </v-tooltip>
-                </td>
-              </tr>
-            </tbody>
-          </v-simple-table>
-        </v-sheet>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          small
+                          class="ml-1"
+                          color="red"
+                          v-bind="attrs"
+                          v-on="on"
+                          @click="deleteSoal(item)"
+                        >
+                          <v-icon>
+                            mdi-delete
+                          </v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Hapus Soal</span>
+                    </v-tooltip>
+                  </td>
+                </tr>
+              </tbody>
+            </v-simple-table>
+          </v-sheet>
+        </template>
+        <v-card-text
+          v-else
+          class="d-flex justify-space-between align-center"
+        >
+          <div class="text-center text-capitalize">
+            belum ada pertanyaan
+          </div>
+          <v-btn
+            color="primary"
+            @click="addSoal()"
+          >
+            tambah soal
+          </v-btn>
+        </v-card-text>
       </template>
-      <v-card-text v-else>
-        belum ada pertanyaan
-      </v-card-text>
     </v-card>
     <v-dialog
       v-model="newDialog"
@@ -230,6 +254,37 @@
       :id="data.id"
       ref="formPertanyaan"
     />
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="300"
+    >
+      <v-card>
+        <v-card-text class="text-center">
+          <v-btn
+            class=""
+            text
+            @click="deleteDialog = false"
+          >
+            Yakin menghapus soal "{{ deleteData.soal }}" ?
+          </v-btn>
+
+          <v-btn
+            color="success"
+            text
+            @click="confirmDelete(deleteData)"
+          >
+            Ya
+          </v-btn>
+          <v-btn
+            color="red"
+            text
+            @click="deleteDialog = false"
+          >
+            Batal
+          </v-btn>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 <script>
@@ -249,6 +304,9 @@
     },
     data () {
       return {
+        loadingData: false,
+        deleteDialog: false,
+        deleteData: {},
         abjad: abjad,
         data: {},
         user: this.$store.state.user.user,
@@ -259,12 +317,20 @@
       }
     },
     created () {
-      console.log(this.id)
       this.getData()
     },
     methods: {
       addSoal () {
         this.$refs.formPertanyaan.open(this.data.id)
+      },
+      deleteSoal (item) {
+        this.deleteData = item
+        this.deleteDialog = true
+      },
+      confirmDelete (item) {
+        axios.delete('/soal/destroy/' + item.id).then(() => {
+          console.log('data dihapus')
+        }).catch(e => { console.log(e) }).finally(() => { this.deleteDialog = false })
       },
       validate () {
         return this.$refs.form.validate()
@@ -298,12 +364,13 @@
         }).catch(e => console.log(e)).finally(() => { this.loadingProcess = false })
       },
       getData () {
+        this.loadingData = true
         axios.get('/quiz/' + this.id, {
         }).then(r => {
           this.data = r.data
         }).catch(function (error) {
           console.log(error)
-        })
+        }).finally(() => { this.loadingData = false })
       },
     },
   }
