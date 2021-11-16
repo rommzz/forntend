@@ -24,7 +24,10 @@
         <v-card-title
           class="d-flex justify-space-between align-center"
         >
-          <div class="">
+          <div
+            class=""
+            @click="snackbar = true"
+          >
             Data Soal
           </div>
           <v-btn
@@ -130,13 +133,19 @@
                   <td>
                     {{ index+1 }}
                   </td>
-                  <td colspan="3">
+                  <td
+                    colspan="3"
+                    :class="item.jenis == 'pilihan_ganda' ? 'py-2' : ''"
+                  >
                     <div style="text-transform: capitalize">
                       {{ item.soal }}
                     </div>
                     <div v-if="item.jenis == 'pilihan_ganda'">
-                      <div>
-                        <span class="primary--text">a.</span> jembot kreweol
+                      <div
+                        v-for="(pilihan, idx) in item.pilihan"
+                        :key="idx"
+                      >
+                        <span class="primary--text">{{ abjad[idx] }}</span> {{ pilihan }}
                       </div>
                     </div>
                   </td>
@@ -148,6 +157,7 @@
                           color="secondary"
                           v-bind="attrs"
                           v-on="on"
+                          @click="editSoal(item)"
                         >
                           <v-icon>
                             mdi-pencil
@@ -165,7 +175,7 @@
                           color="red"
                           v-bind="attrs"
                           v-on="on"
-                          @click="deleteSoal(item)"
+                          @click="deleteSoal(item, index)"
                         >
                           <v-icon>
                             mdi-delete
@@ -189,6 +199,7 @@
           </div>
           <v-btn
             color="primary"
+            class="mr-0"
             @click="addSoal()"
           >
             tambah soal
@@ -236,6 +247,7 @@
         <v-card-actions>
           <v-btn
             color="primary"
+            class="mr-0"
             :loading="loadingProcess"
             @click="process()"
           >
@@ -253,11 +265,25 @@
     <form-pertanyaan
       :id="data.id"
       ref="formPertanyaan"
+      @passResult="v => data.soal = v"
     />
     <v-dialog
       v-model="deleteDialog"
       max-width="300"
+      :persistent="overlay"
     >
+      <v-overlay
+        :value="overlay"
+      >
+        <div class="d-flex flex-column">
+          <v-progress-circular
+            class="mx-auto mb-2"
+            indeterminate
+            size="64"
+          />
+          <span>menhapus data ...</span>
+        </div>
+      </v-overlay>
       <v-card>
         <v-card-text class="text-center">
           <v-btn
@@ -285,6 +311,16 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-snackbar
+      v-model="snackbar"
+      timeout="1"
+      top
+      color="primary"
+      right
+      text
+    >
+      data berhasil dihapus
+    </v-snackbar>
   </v-container>
 </template>
 <script>
@@ -309,8 +345,10 @@
         deleteData: {},
         abjad: abjad,
         data: {},
+        snackbar: false,
         user: this.$store.state.user.user,
         loadingProcess: false,
+        overlay: false,
         valid: true,
         newDialog: false,
         form: this.formObject(),
@@ -321,16 +359,27 @@
     },
     methods: {
       addSoal () {
-        this.$refs.formPertanyaan.open(this.data.id)
+        this.$refs.formPertanyaan.open(this.data.id, 'store')
       },
-      deleteSoal (item) {
-        this.deleteData = item
+      editSoal (item) {
+        const data = Object.assign({}, item)
+        console.log(data)
+        this.$refs.formPertanyaan.open(this.data.id, 'patch', data)
+      },
+      deleteSoal (item, index) {
+        this.deleteData = Object.assign(item, { index: index })
+        console.log(this.deleteData)
         this.deleteDialog = true
       },
       confirmDelete (item) {
+        this.overlay = true
         axios.delete('/soal/destroy/' + item.id).then(() => {
           console.log('data dihapus')
-        }).catch(e => { console.log(e) }).finally(() => { this.deleteDialog = false })
+          this.data.soal.splice(item.index, 1)
+        }).catch(e => { console.log(e) }).finally(() => {
+          this.deleteDialog = false
+          this.overlay = false
+        })
       },
       validate () {
         return this.$refs.form.validate()

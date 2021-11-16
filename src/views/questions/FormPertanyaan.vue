@@ -6,7 +6,7 @@
     >
       <v-card>
         <v-card-title class="primary">
-          <span class="text-h3 font-weight-bold white--text"> Tambah Soal </span>
+          <span class="text-h3 font-weight-bold white--text"> {{ method == 'store' ? 'Tambah' : 'Edit' }} Soal </span>
         </v-card-title>
         <v-card-text>
           <v-form
@@ -33,7 +33,7 @@
               <v-text-field
                 v-model="pilihan"
                 label="pilihan jawaban"
-                @keydown.enter="addPilihan"
+                @keydown.enter="pilihan && addPilihan()"
               />
               <template v-if="form.pilihan.length">
                 <div
@@ -77,8 +77,7 @@
     </v-dialog>
     <v-snackbar
       v-model="snackbar.value"
-      :timeout="-1"
-      absolute
+      :timeout="1"
       top
       :color="snackbar.color"
       right
@@ -101,6 +100,7 @@
           message: null,
           color: null,
         },
+        method: null,
         overlay: false,
         abjad: abjad,
         pilihan: null,
@@ -123,6 +123,14 @@
         ],
       }
     },
+    watch: {
+      dialog: function (val) {
+        if (!val) {
+          this.form = this.getClearForm()
+          this.resetValidation()
+        }
+      },
+    },
     methods: {
       validate () {
         return this.$refs.form.validate()
@@ -135,6 +143,7 @@
       },
       getClearForm () {
         return {
+          id: null,
           jenis: null,
           pilihan: [],
           soal: null,
@@ -142,9 +151,14 @@
           quiz_id: null,
         }
       },
-      open (id) {
-        this.dialog = true
+      open (id, method, data) {
         this.form.quiz_id = id
+        this.method = method
+        if (method === 'patch') {
+          this.form = data
+          console.log(this.form)
+        }
+        this.dialog = true
       },
       addPilihan () {
         this.form.pilihan.push(this.pilihan)
@@ -156,13 +170,17 @@
         }
         this.overlay = true
         axios({
-          method: 'post',
-          url: '/soal/store',
+          method: this.method === 'store' ? 'post' : 'patch',
+          url: '/soal/' + (this.method === 'store' ? 'store' : 'update'),
           data: this.form,
         }).then(r => {
-          // console.log(r)
+          console.log(r)
           this.snackbar.message = 'Data berhasil ditambahkan.'
           this.snackbar.color = 'primary'
+          this.pilihan = null
+          this.form = this.getClearForm()
+          this.resetValidation()
+          this.$emit('passResult', r.data)
         }).catch(e => {
           console.log(e)
           this.snackbar.message = 'Data gagal ditambahkan.'

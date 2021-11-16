@@ -49,6 +49,7 @@
           <tr
             v-for="(item, index) in data"
             :key="index"
+            @click="$router.push({ path: `/questions/${item.id}` })"
           >
             <td>{{ item.judul }}</td>
             <td>{{ item.matpel }}</td>
@@ -80,6 +81,7 @@
                     color="red"
                     v-bind="attrs"
                     v-on="on"
+                    @click.stop
                   >
                     <v-icon>
                       mdi-delete
